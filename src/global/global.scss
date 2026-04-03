@@ -21,3 +21,8 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+sl-input::part(input)::placeholder {
+  color: #909090;
+  opacity: 1; /* Ensure color is not transparent */
+}

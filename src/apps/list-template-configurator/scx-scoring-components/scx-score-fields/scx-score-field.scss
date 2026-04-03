@@ -1,0 +1,48 @@
+.scorebox {
+  /*border: 1px solid var(--sl-color-neutral-200);*/
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 4px;
+  border: 1px solid var(--sl-color-neutral-200);
+
+  &__range {
+    padding: 8px;
+    margin-top: 0;
+    min-width: 5%;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 8px;
+
+
+    div {
+      width: stretch;
+      align-self: center;
+
+      sl-input {
+        width: stretch;
+      }
+    }
+
+    &__numeric {
+      display: flex;
+      align-items: center;
+      gap: var(--sl-spacing-large);
+    }
+  }
+
+  &__body {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 20px;
+
+    &__fromto {
+      width: stretch;
+    }
+  }
+}

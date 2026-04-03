@@ -1,0 +1,27 @@
+$label-width: var(--empty-state-label-width, 300px);
+$label-padding: 0;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sl-font-sans);
+
+  .title-wrap {
+    padding: var(--sl-spacing-x-small);
+    font-weight: var(--sl-font-weight-bold);
+    color: var(--sl-color-neutral-800);
+  }
+
+  .label-wrap {
+    padding: $label-padding;
+    color: var(--sl-color-neutral-500);
+    font-size: var(--sl-font-size-small);
+    width: $label-width;
+    text-align: center;
+  }
+}

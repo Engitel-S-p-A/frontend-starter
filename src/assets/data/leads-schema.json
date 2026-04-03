@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id_lista": {
+        "type": "integer",
+        "minimum": 3,
+        "maximum": 3
+      },
+      "data_file": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DD-MMM-YY",
+        "description": "Date in format DD-MMM-YY"
+      },
+      "C_ANACLI": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 8
+      },
+      "c_id": {
+        "type": ["string", "null"],
+        "minLength": 18,
+        "maxLength": 18
+      },
+      "C_FISCAL": {
+        "type": "string",
+        "minLength": 16,
+        "maxLength": 16
+      },
+      "X_COGNOME": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 30
+      },
+      "X_NOME": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 30
+      },
+      "X_EMAIL": {
+        "type": ["string", "null"],
+        "minLength": 10,
+        "maxLength": 38,
+        "entityType": "email"
+      },
+      "X_INDIR1": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 30
+      },
+      "X_COMUNE": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 24
+      },
+      "C_CAP": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 5
+      },
+      "C_PROV": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2
+      },
+      "N_TELCEL": {
+        "type": ["string", "null"],
+        "minLength": 9,
+        "maxLength": 11,
+        "entityType": "mobile"
+      },
+      "N_TELEF1": {
+        "type": ["string", "null"],
+        "entityType": "landline"
+      },
+      "N_TELEF2": {
+        "type": ["string", "null"],
+        "minLength": 9,
+        "maxLength": 10,
+        "entityType": "landline"
+      },
+      "D_NASCIT": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DDMMMYYYY",
+        "description": "Date in format DDMMMYYYY"
+      },
+      "X_LOCNAS": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 24
+      },
+      "C_PRONAS": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2
+      },
+      "C_SESSO": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "nome_gruppo": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 5
+      },
+      "id_gruppo": {
+        "type": "string",
+        "minLength": 13,
+        "maxLength": 13
+      },
+      "data_inizio_validita": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DD-MMM-YY",
+        "description": "Date in format DD-MMM-YY"
+      },
+      "data_fine_validita": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DD-MMM-YY",
+        "description": "Date in format DD-MMM-YY"
+      },
+      "d_scadenza": {
+        "type": ["null", "null"]
+      },
+      "segm_tmk": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 3
+      },
+      "off_prod": {
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 5
+      },
+      "MacroSeg": {
+        "type": ["null", "null"]
+      },
+      "MicroSeg": {
+        "type": ["null", "null"]
+      },
+      "soc": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 3
+      },
+      "c_age_soc": {
+        "type": "integer",
+        "minimum": 12,
+        "maximum": 12
+      },
+      "ivr": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "c_contratto": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 8
+      },
+      "d_carico": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DD-MMM-YY",
+        "description": "Date in format DD-MMM-YY"
+      },
+      "d_liquid": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 9,
+        "format": "date",
+        "dateFormat": "DD-MMM-YY",
+        "description": "Date in format DD-MMM-YY"
+      },
+      "i_capit": {
+        "type": "integer",
+        "minimum": 528.79,
+        "maximum": 40400
+      },
+      "i_rata": {
+        "type": "number",
+        "minimum": 16.18,
+        "maximum": 1214.49
+      },
+      "c_prod": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2
+      },
+      "c_tpprod": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 6
+      },
+      "num_pratiche_attive": {
+        "type": ["null", "null"]
+      },
+      "c_dipend": {
+        "type": "integer",
+        "minimum": 11,
+        "maximum": 786
+      },
+      "c_carta": {
+        "type": ["null", "null"]
+      },
+      "desc_carta": {
+        "type": ["null", "null"]
+      },
+      "d_scadenza_carta": {
+        "type": ["null", "null"]
+      },
+      "c_emett": {
+        "type": ["null", "null"]
+      },
+      "fido": {
+        "type": ["null", "null"]
+      },
+      "up_fido": {
+        "type": ["null", "null"]
+      },
+      "finanziato_residuo": {
+        "type": ["null", "null"]
+      },
+      "numero_rate_residuo": {
+        "type": ["null", "null"]
+      },
+      "tipo_accordo": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2
+      },
+      "text1": {
+        "type": "string",
+        "minLength": 49,
+        "maxLength": 49
+      },
+      "text2": {
+        "type": ["string", "null"],
+        "minLength": 27,
+        "maxLength": 27
+      },
+      "text3": {
+        "type": ["string", "null"],
+        "minLength": 5,
+        "maxLength": 29
+      },
+      "text4": {
+        "type": ["null", "null"]
+      },
+      "text5": {
+        "type": ["null", "null"]
+      },
+      "text6": {
+        "type": ["null", "null"]
+      },
+      "text7": {
+        "type": ["null", "null"]
+      },
+      "text8": {
+        "type": ["null", "null"]
+      },
+      "text9": {
+        "type": ["null", "null"]
+      },
+      "text10": {
+        "type": ["null", "null"]
+      },
+      "cnv_for": {
+        "type": ["string", "null"],
+        "minLength": 6,
+        "maxLength": 60
+      },
+      "descr_bene": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 30
+      }
+    }
+  }
+}

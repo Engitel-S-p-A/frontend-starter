@@ -49,11 +49,7 @@ export class ScxExampleComponents implements ComponentInterface {
    */
   private tabs: TabConfig[] = [];
 
-  async componentWillLoad() {
-    // Initialize DI container if not already initialized
-    // This is needed when component is used standalone (without scx-root)
-    await starter.init({ apiBaseUrl: '' });
-
+  componentWillLoad() {
     // Initialize tabs configuration
     this.tabs = [
       {
@@ -80,11 +76,6 @@ export class ScxExampleComponents implements ComponentInterface {
         id: 'icons',
         label: 'Custom Icons',
         renderContent: () => this.renderIconsTab(),
-      },
-      {
-        id: 'range',
-        label: 'Range Slider',
-        renderContent: () => this.renderRangeTab(),
       },
     ];
   }
@@ -541,110 +532,6 @@ export class ScxExampleComponents implements ComponentInterface {
                   </code>
                 </td>
                 <td>Combine size and color</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  }
-
-  /**
-   * Render Range Slider tab content
-   */
-  private renderRangeTab() {
-    return (
-      <div class="tab-content">
-        <p class="description">
-          Shoelace range slider component with various configurations. Supports custom min/max values, step increments,
-          tooltips, and different sizes.
-        </p>
-
-        <div class="example-demo">
-          <scx-example-range></scx-example-range>
-        </div>
-
-        <div class="api-docs">
-          <h3>Key Features</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Feature</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <code>Custom Range</code>
-                </td>
-                <td>Set custom min and max values for any numeric range</td>
-              </tr>
-              <tr>
-                <td>
-                  <code>Step Increments</code>
-                </td>
-                <td>Control precision with step values (e.g., step by 5 or 0.1)</td>
-              </tr>
-              <tr>
-                <td>
-                  <code>Tooltips</code>
-                </td>
-                <td>Display current value in a tooltip while dragging</td>
-              </tr>
-              <tr>
-                <td>
-                  <code>Labels & Help Text</code>
-                </td>
-                <td>Add descriptive labels and help text for better UX</td>
-              </tr>
-              <tr>
-                <td>
-                  <code>Disabled State</code>
-                </td>
-                <td>Disable interaction when needed</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h3>Common Use Cases</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Use Case</th>
-                <th>Configuration</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Volume Control</td>
-                <td>
-                  <code>
-                    min={0} max={100}
-                  </code>{' '}
-                  with percentage display
-                </td>
-              </tr>
-              <tr>
-                <td>Temperature</td>
-                <td>
-                  <code>
-                    min={-10} max={40}
-                  </code>{' '}
-                  for celsius range
-                </td>
-              </tr>
-              <tr>
-                <td>Price Filter</td>
-                <td>
-                  <code>step={5}</code> for rounded price increments
-                </td>
-              </tr>
-              <tr>
-                <td>Progress Indicator</td>
-                <td>
-                  <code>tooltip="top"</code> with percentage value
-                </td>
               </tr>
             </tbody>
           </table>

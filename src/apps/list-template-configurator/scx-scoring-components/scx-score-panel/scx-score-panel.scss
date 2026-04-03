@@ -1,0 +1,151 @@
+.scoresDialog {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+}
+
+scx-score-panel {
+  width: calc(50% - 0.5rem);
+
+  .singleScorePanel {
+    height: 100%;
+  }
+}
+
+.weight {
+  font-size: 1.3rem;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+.orange {
+  color: orange;
+}
+
+.singleScorePanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.score-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 15px;
+  border: 1px solid var(--sl-color-neutral-200);
+  border-radius: 5px;
+  font-weight: 700;
+
+  &__title {
+    font-size: 1rem;
+  }
+
+  &__amount {
+    display: flex;
+    align-items: center;
+
+    &__value {
+      font-size: 1rem;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+
+      &__border {
+        border-right: 1px solid var(--sl-color-neutral-200);
+        padding: 0px 20px;
+      }
+    }
+
+    &__button {
+      font-size: 1rem;
+      padding: 0px 20px;
+    }
+  }
+}
+
+.score-panel-add {
+  margin-bottom: 16px;
+
+  sl-button {
+    width: 100%;
+  }
+}
+
+.score-panel-body {
+
+  padding: 0px;
+  display: flex;
+  justify-content: flex-start;
+
+  flex-direction: column;
+  height: 100%;
+
+  sl-icon {
+    font-size: 2rem;
+    color: var(--sl-color-primary-500);
+  }
+
+  &__empty {
+    text-align: center;
+    align-self: center;
+    padding: 8em 0;
+    border: 1px solid var(--sl-color-neutral-200);
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h4 {
+      margin-bottom: 5px;
+      margin-top: 3px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.75rem;
+    }
+
+    sl-icon {
+      width: 63px;
+      height: 63px;
+      background-color: #DEE2E7;
+      border-radius: 50%;
+    }
+  }
+
+  .card-header__content {
+    sl-icon {
+      font-size: 1rem;
+      color: var(--sl-color-neutral-950);
+    }
+  }
+}
+
+scx-add-score {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font-size: 0.75rem;
+  margin-bottom: 12px;
+  border: 1px solid var(--sl-color-neutral-200);
+  border-radius: 5px;
+}
+
+.icon-total-weight {
+  font-size: 1.25rem !important;
+  margin-left: 7px;
+}

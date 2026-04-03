@@ -1,0 +1,137 @@
+.card-header {
+  max-width: none;
+  width: 100%;
+  --border-width: 0px;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+
+    sl-icon {
+      font-size: 1rem;
+      cursor: default;
+      color: var(--sl-color-primary-500);
+    }
+  }
+
+  &__contentright {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    sl-icon {
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  }
+
+
+  h4 {
+    margin: 0;
+    font-size: 0.75rem;
+
+  }
+
+  &sl-icon-button {
+    font-size: var(--sl-font-size-medium);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: calc(var(--sl-spacing-large) * -1);
+    padding: 0 16px;
+    height: 37px;
+    background-color: #F1F3F7;
+    margin-top: -10px;
+  }
+}
+
+.card-body {
+  h5 {
+    margin-bottom: 10px;
+    font-size: 0.75rem;
+
+    span {
+      color: red;
+    }
+  }
+
+  &__div {
+    display: flex;
+    gap: var(--sl-spacing-large);
+    align-items: center;
+    position: relative;
+    margin-top: 47px;
+  }
+
+  &__select {
+    display: flex;
+    gap: var(--sl-spacing-large);
+    align-items: center;
+    position: relative;
+    margin-top: 0px;
+    min-width: 40%;
+  }
+
+  &__fieldtype {
+    border-top: 1px solid var(--sl-color-neutral-200);
+    margin-top: 30px;
+  }
+
+  &__buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+  }
+}
+
+sl-select {
+  width: stretch;
+}
+
+sl-input {
+  /*max-width: 100px;*/
+  display: inline;
+}
+
+sl-range {
+  width: stretch;
+  margin-top: 7px;
+}
+
+sl-radio-group {
+  --sl-spacing-medium: 1rem;
+  display: flex;
+
+  & * {
+    display: inline;
+    margin-right: 30px;
+  }
+}
+
+.disclaimer {
+  background-color: #E5EBF6;
+  color: var(--sl-color-primary-500);
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 20px;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.scores {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectcontainer {
+  min-width: 250px;
+  margin-top: -47px;
+}

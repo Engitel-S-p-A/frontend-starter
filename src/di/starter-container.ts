@@ -1,4 +1,7 @@
 import { Container } from 'inversify';
+import { IListTemplateConfiguratorService } from '../apps/list-template-configurator/list-template-configurator.interface';
+import { listTemplateConfiguratorModule } from '../apps/list-template-configurator/list-template-configurator.module';
+import { LIST_TEMPLATE_CONFIGURATOR_TYPES } from '../apps/list-template-configurator/list-template-configurator.types';
 import type { IOutboundService } from '../apps/outbound-manager/outbound.interface';
 import { outboundModule } from '../apps/outbound-manager/outbound.module';
 import { OUTBOUND_TYPES } from '../apps/outbound-manager/outbound.types';
@@ -61,24 +64,21 @@ export class StarterContainer extends Container {
       return;
     }
 
-    console.log('StarterContainer initializing...');
-
     // 1. Load Logger module (no dependencies)
     this.load(loggerModule);
-    console.log('Logger module loaded');
 
     // 2. Load API module with configuration
     const apiModule = createApiModule({ apiUrl: options.apiBaseUrl });
     this.load(apiModule);
-    console.log('API module loaded');
 
     // 3. Load Modal module (no dependencies)
     this.load(modalModule);
-    console.log('Modal module loaded');
 
     // 4. Load Outbound module (depends on Logger + API)
     this.load(outboundModule);
-    console.log('Outbound module loaded');
+
+    // 5. Load Template Configurator module (depends on Logger + API)
+    this.load(listTemplateConfiguratorModule);
 
     this.initialized = true;
     console.log('StarterContainer initialized');
@@ -125,5 +125,9 @@ export class StarterContainer extends Container {
    */
   get modal(): IModal {
     return this.get<IModal>(MODAL_TYPES.Modal);
+  }
+
+  get templateConfiguratorService(): IListTemplateConfiguratorService {
+    return this.get<IListTemplateConfiguratorService>(LIST_TEMPLATE_CONFIGURATOR_TYPES.TemplateConfiguratorService);
   }
 }

@@ -36,3 +36,9 @@ slot::slotted(*) {
   flex-grow: 0;
   flex-shrink: 0;
 }
+
+:host {
+  text-align: center;
+  width: 300px;
+  margin: 10px auto;
+}

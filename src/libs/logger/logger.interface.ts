@@ -14,6 +14,7 @@ export enum StarterDebugNamespaces {
   Core = 'core',
   Api = 'api',
   Outbound = 'outbound',
+  TemplateConfigurator = 'template-configurator',
 }
 
 /**

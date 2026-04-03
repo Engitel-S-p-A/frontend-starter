@@ -15,11 +15,17 @@ declare module 'tabulator-tables' {
 
   export interface CellComponent {
     getValue(): unknown;
+    setValue(value: unknown): void;
+    getRow(): RowComponent;
+    getElement(): HTMLElement;
     [key: string]: unknown;
   }
 
   export interface RowComponent {
     getData(): unknown;
+    getCell(field: string): CellComponent | null;
+    update(data: unknown): void;
+    getPosition(): number;
     [key: string]: unknown;
   }
 
@@ -28,6 +34,9 @@ declare module 'tabulator-tables' {
     on(event: string, callback: (...args: unknown[]) => void): void;
     destroy(): void;
     getData(): unknown[];
+    getRows(): RowComponent[];
+    replaceData(data: unknown[]): void;
+    [key: string]: unknown;
   }
 
   export class TabulatorFull extends Tabulator {
@@ -48,6 +57,7 @@ declare module 'tabulator-tables' {
     rowHandle?: boolean;
     frozen?: boolean;
     cssClass?: string;
+    visible?: boolean;
     [key: string]: unknown;
   }
 }
