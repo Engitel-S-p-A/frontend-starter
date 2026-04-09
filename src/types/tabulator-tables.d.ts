@@ -26,6 +26,7 @@ declare module 'tabulator-tables' {
     getCell(field: string): CellComponent | null;
     update(data: unknown): void;
     getPosition(): number;
+    getIndex(): number;
     [key: string]: unknown;
   }
 

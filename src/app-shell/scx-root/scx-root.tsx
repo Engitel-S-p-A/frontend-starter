@@ -12,7 +12,6 @@ export class ScxRoot implements ComponentInterface {
   @Prop() apiUrl = '';
   @State() initialized = false;
   @State() selectedRadioValue = 'mapping';
-  @State() lastModalResult = 'Not opened yet';
 
   async componentWillLoad() {
     await starter.init({ apiBaseUrl: this.apiUrl });
@@ -24,44 +23,18 @@ export class ScxRoot implements ComponentInterface {
     this.selectedRadioValue = event.detail;
   }
 
-  renderContent = () => {
-    switch (this.selectedRadioValue) {
-      case 'mapping':
-        // return <movable-rows-table></movable-rows-table>;
-        return <add-model></add-model>;
-      case 'scoring':
-        return (
-          <div class="scoresDialog">
-            <score-panel scope="Contactability"></score-panel>
-            <score-panel scope="Propensity"></score-panel>
-          </div>
-        );
-      case 'options':
-        return <p>options.</p>;
-      default:
-        return null;
-    }
-  };
   private openModal = () => {
     const modal = starter.modal;
 
     modal.create({
-      component: 'scx-modal-score',
+      component: 'list-template-configurator',
       width: '90%',
       height: '90%',
       dismissOnEsc: true,
       backdropDismiss: true,
       componentProps: {
-        modalTitle: 'Score modal',
+        modalTitle: 'Add model List',
       },
-    });
-
-    modal.onDismiss((data) => {
-      if (data.confirm) {
-        this.lastModalResult = '✅ User confirmed';
-      } else if (data.dismiss) {
-        this.lastModalResult = '❌ User dismissed';
-      }
     });
 
     modal.show();
@@ -73,7 +46,6 @@ export class ScxRoot implements ComponentInterface {
         {this.initialized ? (
           <div>
             <sl-button onClick={this.openModal}>Open Modal</sl-button>
-            <p class="result">Last result: {this.lastModalResult}</p>
           </div>
         ) : (
           <div class="loading">{tt('SM.SHELL.INITIALIZING')}</div>

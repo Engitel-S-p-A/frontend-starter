@@ -29,7 +29,7 @@ export class ScxFileUploader implements ComponentInterface {
         ) : null}
         {this.label ? (
           <div class="label-wrap">
-            <span innerHTML={this.label}></span>
+            <span>{this.label}</span>
           </div>
         ) : null}
         <slot></slot>

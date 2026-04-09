@@ -25,6 +25,7 @@
     sl-icon {
       font-size: 1rem;
       cursor: pointer;
+      color: #71717a;
     }
   }
 
@@ -48,6 +49,10 @@
     height: 37px;
     background-color: #F1F3F7;
     margin-top: -10px;
+    &.closed {
+      background-color: transparent;
+      border-bottom: 1px solid #F1F3F7;
+    }
   }
 }
 
@@ -71,11 +76,13 @@
 
   &__select {
     display: flex;
-    gap: var(--sl-spacing-large);
-    align-items: center;
+    gap: 0;
+    align-items: flex-start;
     position: relative;
     margin-top: 0px;
     min-width: 40%;
+    flex-direction: column;
+    margin-top: -51px;
   }
 
   &__fieldtype {
@@ -134,4 +141,10 @@ sl-radio-group {
 .selectcontainer {
   min-width: 250px;
   margin-top: -47px;
+}
+.scorebox__range{
+  border-radius: 5px;
+    padding: 7px 48px 7px 8px;
+    margin-top: -4px;
+    border: 1px solid var(--sl-color-neutral-200);
 }

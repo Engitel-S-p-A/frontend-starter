@@ -54,8 +54,8 @@ describe('ListTemplateConfiguratorService', () => {
   describe('initialization', () => {
     it('should initialize with empty state', () => {
       expect(service.mappingItems$.value).toEqual([]);
-      expect(service.JSONFields$.value).toEqual([]);
-      expect(service.UserModel$.value).toBeNull();
+      expect(service.jsonFields$.value).toEqual([]);
+      expect(service.userModel$.value).toBeNull();
       expect(service.fieldsToSend$.value).toEqual([]);
       expect(service.formToSend$.value).toEqual({ contactability: [], propensity: [] });
       expect(service.totalweight$.value).toBe(0);
@@ -68,7 +68,7 @@ describe('ListTemplateConfiguratorService', () => {
     });
   });
 
-  describe('LoadcsvJson', () => {
+  describe('loadcsvJson', () => {
     it('should load json text successfully', async () => {
       const mockFetch = jest.fn().mockResolvedValue({
         ok: true,
@@ -76,9 +76,9 @@ describe('ListTemplateConfiguratorService', () => {
       });
       global.fetch = mockFetch as typeof fetch;
 
-      const result = await service.LoadcsvJson();
+      const result = await service.loadcsvJson();
 
-      expect(mockFetch).toHaveBeenCalledWith('../../assets/data/leads-schema.json');
+      expect(mockFetch).toHaveBeenCalledWith('/assets/data/leads-schema.json');
       expect(result).toBe('{"items":{"properties":{}}}');
     });
 
@@ -86,7 +86,7 @@ describe('ListTemplateConfiguratorService', () => {
       const mockFetch = jest.fn().mockRejectedValue(new Error('Network error'));
       global.fetch = mockFetch as typeof fetch;
 
-      const result = await service.LoadcsvJson();
+      const result = await service.loadcsvJson();
 
       expect(result).toBe('');
     });
@@ -94,7 +94,7 @@ describe('ListTemplateConfiguratorService', () => {
 
   describe('loadMappingFields', () => {
     it('should load mapping fields successfully', async () => {
-      jest.spyOn(service, 'LoadcsvJson').mockResolvedValue(`{
+      jest.spyOn(service, 'loadcsvJson').mockResolvedValue(`{
         "items": {
           "properties": {
             "id_lista": {
@@ -155,21 +155,21 @@ describe('ListTemplateConfiguratorService', () => {
           hidden: false,
         },
       ]);
-      expect(service.JSONFields$.value).toEqual(result);
+      expect(service.jsonFields$.value).toEqual(result);
     });
 
     it('should return empty array when no data is loaded', async () => {
-      jest.spyOn(service, 'LoadcsvJson').mockResolvedValue('');
+      jest.spyOn(service, 'loadcsvJson').mockResolvedValue('');
 
       const result = await service.loadMappingFields();
 
       expect(result).toEqual([]);
-      expect(service.JSONFields$.value).toEqual([]);
+      expect(service.jsonFields$.value).toEqual([]);
       expect(mockLoggerInstance.error).toHaveBeenCalled();
     });
 
     it('should return empty array for invalid json', async () => {
-      jest.spyOn(service, 'LoadcsvJson').mockResolvedValue('{invalid json}');
+      jest.spyOn(service, 'loadcsvJson').mockResolvedValue('{invalid json}');
 
       const result = await service.loadMappingFields();
 
@@ -187,7 +187,7 @@ describe('ListTemplateConfiguratorService', () => {
     it('should save json fields and mapping items', async () => {
       await service.saveMapping(mappingFields);
 
-      expect(service.JSONFields$.value).toEqual(mappingFields);
+      expect(service.jsonFields$.value).toEqual(mappingFields);
       expect(service.mappingItems$.value).toEqual([
         { csvField: 'phone', aliasName: 'telephone', mappingField: 'landline' },
         { csvField: 'customer_email', aliasName: '', mappingField: 'email' },
@@ -205,7 +205,7 @@ describe('ListTemplateConfiguratorService', () => {
 
       await service.saveMapping(mappingFields);
 
-      expect(service.UserModel$.value).toEqual({
+      expect(service.userModel$.value).toEqual({
         ...model,
         properties: mappingFields,
       });
@@ -223,12 +223,12 @@ describe('ListTemplateConfiguratorService', () => {
 
       await service.saveModel(model);
 
-      expect(service.UserModel$.value).toEqual(model);
+      expect(service.userModel$.value).toEqual(model);
     });
 
-    it('should default model properties from JSONFields when missing', async () => {
+    it('should default model properties from jsonFields when missing', async () => {
       const jsonFields: CSVJSONItems[] = [{ name: 'field_1', type: 'string' }];
-      service.JSONFields$.next(jsonFields);
+      service.jsonFields$.next(jsonFields);
 
       await service.saveModel({
         id: 'model-1',
@@ -237,7 +237,7 @@ describe('ListTemplateConfiguratorService', () => {
         properties: undefined as unknown as CSVJSONItems[],
       });
 
-      expect(service.UserModel$.value).toEqual({
+      expect(service.userModel$.value).toEqual({
         id: 'model-1',
         name: 'My Model',
         fileName: 'model.csv',
@@ -255,7 +255,7 @@ describe('ListTemplateConfiguratorService', () => {
 
       await service.deleteModel();
 
-      expect(service.UserModel$.value).toBeNull();
+      expect(service.userModel$.value).toBeNull();
     });
 
     it('should update model fileName when a model exists', async () => {
@@ -269,7 +269,7 @@ describe('ListTemplateConfiguratorService', () => {
       const result = await service.updateModelFileName('updated-model.csv');
 
       expect(result).toBe(true);
-      expect(service.UserModel$.value?.fileName).toBe('updated-model.csv');
+      expect(service.userModel$.value?.fileName).toBe('updated-model.csv');
     });
 
     it('should return false when updating fileName without model', async () => {
@@ -404,7 +404,7 @@ describe('ListTemplateConfiguratorService', () => {
 
   describe('BehaviorSubject state management', () => {
     it('should emit initial values to subscribers', (done) => {
-      service.JSONFields$.subscribe((fields) => {
+      service.jsonFields$.subscribe((fields) => {
         expect(Array.isArray(fields)).toBe(true);
         done();
       });
@@ -413,7 +413,7 @@ describe('ListTemplateConfiguratorService', () => {
     it('should emit updates to all subscribers', async () => {
       const emissions: CSVJSONItems[][] = [];
       const mappingFields: CSVJSONItems[] = [{ name: 'field_1', type: 'string' }];
-      service.JSONFields$.subscribe((fields) => emissions.push([...fields]));
+      service.jsonFields$.subscribe((fields) => emissions.push([...fields]));
 
       await service.saveMapping(mappingFields);
 

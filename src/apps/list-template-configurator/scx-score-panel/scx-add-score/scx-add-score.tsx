@@ -11,6 +11,7 @@ import {
   h,
 } from '@stencil/core';
 import { starter } from '../../../../di/containers';
+import { tt } from '../../../../libs/i18n';
 import { FieldToSend, Score } from '../../list-template-configurator.interface';
 
 export interface Field {
@@ -195,7 +196,7 @@ export class ScxAddScore implements ComponentInterface {
     return (
       <Fragment>
         <sl-card class="card-header">
-          <div slot="header" class="card-header__header">
+          <div slot="header" class={`card-header__header ${!this.editMode && 'closed'}`}>
             <div class="card-header__content">
               <sl-icon
                 name={
@@ -209,7 +210,11 @@ export class ScxAddScore implements ComponentInterface {
                 }
                 label="Settings"
               ></sl-icon>
-              {this.editMode && !this.fieldScore.name ? <h4>Add Score</h4> : <h4>{this.fieldScore.name}</h4>}
+              {this.editMode && !this.fieldScore.name ? (
+                <h4>{tt('SM.SCORING.PANEL.ADD')}</h4>
+              ) : (
+                <h4>{this.fieldScore.name}</h4>
+              )}
             </div>
             <div class="card-header__contentright">
               {!this.editMode && (
@@ -227,13 +232,15 @@ export class ScxAddScore implements ComponentInterface {
               <div class="card-body__div">
                 {this.editMode && (
                   <>
-                    <h5>
-                      Select one <span>*</span>
-                    </h5>
                     <div class="card-body__select">
+                      <h5>
+                        {tt('SM.ADD.SCORE.SELECT')}
+                        <span> *</span>
+                      </h5>
                       <sl-select
                         required
                         value={this.fieldScore.name != '' && this.fieldScore.name}
+                        size="small"
                         onsl-change={(e: Event) => {
                           const target = e.target as HTMLFormElement & { value: string };
                           this.fieldScore = {
@@ -252,13 +259,13 @@ export class ScxAddScore implements ComponentInterface {
                   </>
                 )}
 
-                <div>Weight</div>
+                <div>{tt('SM.ADD.SCORE.WEIGHT')}</div>
                 <sl-range value={this.fieldScore.weight} onsl-change={(e: Event) => this.totalWeightEdit(e)}></sl-range>
                 <div class="scorebox scorebox__range">{this.fieldScore.weight}%</div>
               </div>
               {this.editMode && (
                 <div class="card-body__fieldtype">
-                  <h5>Field type</h5>
+                  <h5>{tt('SM.ADD.SCORE.TYPE')}</h5>
                   <sl-radio-group
                     name="a"
                     value={this.fieldScore.type}
@@ -271,15 +278,13 @@ export class ScxAddScore implements ComponentInterface {
                       };
                     }}
                   >
-                    <sl-radio value="Unset">Unset</sl-radio>
-                    <sl-radio value="Numeric">Numeric</sl-radio>
-                    <sl-radio value="Date">Date</sl-radio>
-                    <sl-radio value="String">String</sl-radio>
-                    <sl-radio value="Boolean">Boolean</sl-radio>
+                    <sl-radio value="Unset">{tt('SM.ADD.SCORE.UNSET')}</sl-radio>
+                    <sl-radio value="Numeric">{tt('SM.ADD.SCORE.NUMERIC')}</sl-radio>
+                    <sl-radio value="Date">{tt('SM.ADD.SCORE.DATE')}</sl-radio>
+                    <sl-radio value="String">{tt('SM.ADD.SCORE.STRING')}</sl-radio>
+                    <sl-radio value="Boolean">{tt('SM.ADD.SCORE.BOOLEAN')}</sl-radio>
                   </sl-radio-group>
-                  <div class="disclaimer">
-                    Assign score 1-3 based on field value. Missing values automatically get score 2.
-                  </div>
+                  <div class="disclaimer">{tt('SM.ADD.SCORE.DISCLAIMER')}</div>
                 </div>
               )}
               <div class={!this.editMode ? 'scores' : ''}>
@@ -290,11 +295,11 @@ export class ScxAddScore implements ComponentInterface {
 
               {this.editMode && (
                 <div class="card-body__buttons">
-                  <sl-button variant="text" size="large" onClick={() => this.closeDialog()}>
-                    Cancel
+                  <sl-button variant="text" size="medium" onClick={() => this.closeDialog()}>
+                    {tt('SM.BUTTON.CANCEL')}
                   </sl-button>
                   <sl-button type="submit" variant="neutral" size="medium">
-                    Confirm
+                    {tt('SM.BUTTON.CONFIRM')}
                   </sl-button>
                 </div>
               )}

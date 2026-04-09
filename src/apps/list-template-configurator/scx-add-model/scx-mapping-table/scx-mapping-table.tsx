@@ -1,78 +1,77 @@
-import { Component, ComponentInterface, Element, Event, EventEmitter, Method, State, h } from '@stencil/core';
+import { Component, ComponentInterface, Element, Event, EventEmitter, Listen, Method, State, h } from '@stencil/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { CellComponent, ColumnDefinition, RowComponent, Tabulator } from 'tabulator-tables';
 import { starter } from '../../../../di/containers';
+import { tt } from '../../../../libs/i18n';
 import { CSVJSONItems, Model } from '../../list-template-configurator.interface';
 
 @Component({
   tag: 'scx-mapping-table',
   styleUrl: 'scx-mapping-table.scss',
   shadow: true,
-  assetsDirs: ['assets'], // <— important when packaging as a library
+  assetsDirs: ['assets'],
 })
 export class ScxMappingTable implements ComponentInterface {
   @State() tableData: { name: string; entityType?: string; [key: string]: unknown }[] = [];
   @State() csvFields: CSVJSONItems[] = [];
   @State() userModel: Model | null = null;
+  @State() modelNameErrorShow = false;
+  @State() fileErrorShow = false;
   @Event() changePage!: EventEmitter<string>;
   private persistedUserModel: Model | null = null;
-
-  // @State() initialized = false;
-
-  // Subscription management
   private subscriptions: Subscription[] = [];
-
   @Element() el!: HTMLElement;
+
+  private boundAliasInputs = new WeakSet<HTMLElement>();
 
   private table?: Tabulator;
   private tableContainer?: HTMLDivElement;
-  private fileTagEl?: HTMLElement;
 
   private columns: ColumnDefinition[] = [
-    { title: 'CSV Fields', field: 'name' },
+    { title: tt('SM.MAPPING.TABLE.COLUMN.CSV_FIELDS'), field: 'name' },
     { title: 'type', field: 'entityType', visible: false },
     {
-      title: 'Rename field',
+      title: tt('SM.MAPPING.TABLE.COLUMN.RENAME_FIELD'),
       field: 'alias',
       width: 200,
       minWidth: 200,
       formatter: (cell: CellComponent) => {
         // Set value if present
         const value = cell.getValue() || '';
-        // Use name for input id
-        const rowIndex = cell.getRow().getPosition(); // Get row index for unique ID
+
+        const rowIndex = cell.getRow().getIndex(); // Get row index for unique ID
         const inputId = `rename-input-${rowIndex}`;
-        return `<sl-input class="my-input" id="${inputId}" value="${value}" placeholder="Rename field" style="--sl-input-height-medium:30px;width:100%;box-sizing:border-box;overflow:hidden;"></sl-input>`;
+        return `<sl-input class="my-input" id="${inputId}" value="${value}" placeholder="${tt('SM.MAPPING.TABLE.COLUMN.RENAME_FIELD')}" style="--sl-input-height-medium:30px;width:100%;box-sizing:border-box;overflow:hidden;"></sl-input>`;
       },
     },
-    this.checkboxColumn('ID', 'leadId'),
-    this.checkboxColumn('Phone', 'landline'),
-    this.checkboxColumn('Mobile', 'mobile'),
-    this.checkboxColumn('E-mail', 'email'),
-    this.checkboxColumn('Recency (R)', 'recency'),
-    this.checkboxColumn('Monetary (M)', 'monetary'),
-    this.checkboxColumn('Frequency (F)', 'frequency'),
-    this.checkboxColumn('Mandatory', 'mandatory'),
-    this.checkboxColumn('Hidden', 'hidden'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.ID')}`, 'leadId'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.PHONE')}`, 'landline'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.MOBILE')}`, 'mobile'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.EMAIL')}`, 'email'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.RECENCY')}`, 'recency'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.MONETARY')}`, 'monetary'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.FREQUENCY')}`, 'frequency'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.MANDATORY')}`, 'mandatory'),
+    this.checkboxColumn(`${tt('SM.MAPPING.TABLE.COLUMN.HIDDEN')}`, 'hidden'),
   ];
 
   async componentWillLoad() {
     const service = starter.templateConfiguratorService;
 
     this.subscriptions.push(
-      service.UserModel$.subscribe((model) => {
+      service.userModel$.subscribe((model) => {
         this.userModel = model ? { ...model } : null;
         this.persistedUserModel = model ? { ...model } : null;
       })
     );
 
     this.subscriptions.push(
-      service.JSONFields$.subscribe((CSVJSONItems) => {
+      service.jsonFields$.subscribe((CSVJSONItems) => {
         this.csvFields = CSVJSONItems ? [...CSVJSONItems] : [];
       })
     );
 
-    this.ReadcsvJson()
+    this.readcsvJson()
       .then((jsonFields) => {
         this.csvFields = jsonFields;
         this.tableData = jsonFields.map((field) => ({
@@ -87,33 +86,31 @@ export class ScxMappingTable implements ComponentInterface {
           mandatory: (field as { mandatory?: boolean }).mandatory ?? false,
           hidden: (field as { hidden?: boolean }).hidden ?? false,
         }));
-        console.log('tableData:', this.tableData);
+
         // If Tabulator is already initialized, update its data
         if (this.table) {
           this.table.replaceData(this.tableData);
         }
       })
-      .catch((error) => {
-        console.log('Failed to load CSV fields:', error);
+      .catch(() => {
+        this.csvFields = [];
+        this.tableData = [];
       });
   }
 
   async componentDidLoad() {
-    this.fileTagEl?.addEventListener('sl-remove', this.handleModelRemove as EventListener);
-
     if (!this.tableContainer) return;
 
     // Dynamic import of Tabulator - it exports as default
     const tabulatorModule = await import('tabulator-tables');
 
-    const TabulatorClass = (tabulatorModule.default ?? tabulatorModule) as unknown as typeof Tabulator;
+    const tabulatorClass = (tabulatorModule.default ?? tabulatorModule) as unknown as typeof Tabulator;
 
-    if (!TabulatorClass) {
-      console.error('Tabulator constructor not found');
+    if (!tabulatorClass) {
       return;
     }
 
-    this.table = new TabulatorClass(this.tableContainer, {
+    this.table = new tabulatorClass(this.tableContainer, {
       layout: 'fitColumns',
       movableRows: true,
       rowHeader: {
@@ -123,7 +120,7 @@ export class ScxMappingTable implements ComponentInterface {
         width: 30,
         rowHandle: true,
         formatter: () => {
-          return '<sl-icon name="cv-drag-circle" class="drag-handle"></sl-icon>';
+          return '<sl-icon size="medium" name="cv-drag-circle" class="drag-handle"></sl-icon>';
         },
       },
       data: this.tableData,
@@ -141,40 +138,40 @@ export class ScxMappingTable implements ComponentInterface {
           // Find the cell whose field matches the entitytype
           const cell = row.getCell(type);
           if (cell) {
-            // setValue(value, mutate) → mutate=true avoids triggering an edit event
             cell.setValue(true);
           }
         }
 
-        // Handle renameField input synchronization for Shoelace sl-input
+        // Handle renameField input synchronization
         const cell2 = row.getCell('alias');
         if (!cell2) return;
 
-        const slInput = cell2.getElement().querySelector('sl-input.my-input');
+        const slInput = cell2.getElement().querySelector('sl-input.my-input') as
+          | (HTMLElement & { value?: string })
+          | null;
         if (!slInput) return;
 
-        // Attach event listener once
-        if (!(slInput as { _bound?: boolean })._bound) {
-          slInput.addEventListener('sl-change', (event: Event) => {
-            const target = event.target as HTMLInputElement;
-            const value = target.value;
+        if (!this.boundAliasInputs.has(slInput)) {
+          const handler: EventListener = (event: Event) => {
+            const target = event.target as HTMLElement & { value?: string };
+            const value = target.value ?? '';
             const rowData = row.getData() as { name: string; entityType?: string; [key: string]: unknown };
             rowData.alias = value;
             row.update(rowData);
-            // Optionally, keep Tabulator's cell value in sync
+
             if (cell2.getValue() !== value) {
-              cell2.setValue(value); // true = silent
+              cell2.setValue(value);
             }
-            console.log(`Row data after alias input:`, rowData);
-          });
-          (slInput as { _bound?: boolean })._bound = true;
+          };
+
+          slInput.addEventListener('sl-change', handler);
+          this.boundAliasInputs.add(slInput);
         }
       });
     });
   }
 
   private checkboxColumn(title: string, field: string): ColumnDefinition {
-    // const field = title.toLowerCase().replace(/\s+/g, '_');
     return {
       title,
       field,
@@ -182,7 +179,7 @@ export class ScxMappingTable implements ComponentInterface {
       hozAlign: 'center',
       formatter: (cell: CellComponent) => {
         const checked = cell.getValue() === true ? 'checked' : '';
-        return `<div class="checkbox-container"><sl-checkbox ${checked}></sl-checkbox></div>`;
+        return `<div class="checkbox-container"><sl-checkbox size="small" ${checked}></sl-checkbox></div>`;
       },
       cellClick: (_e: unknown, cell: CellComponent) => {
         const current = cell.getValue();
@@ -192,33 +189,27 @@ export class ScxMappingTable implements ComponentInterface {
         const newChecked = !current;
         cell.setValue(newChecked);
         row.update(rowData); // update row data to reflect the change
-        console.log(`Row data after ${title} toggle:`, rowData);
       },
     };
   }
 
   disconnectedCallback() {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-    this.fileTagEl?.removeEventListener('sl-remove', this.handleModelRemove as EventListener);
+
     if (this.table) {
       this.table.destroy();
     }
   }
 
   /** Read CSV and load into Tabulator */
-  private async ReadcsvJson(): Promise<CSVJSONItems[]> {
+  private async readcsvJson(): Promise<CSVJSONItems[]> {
     try {
-      console.log('Loading mapping fields from constant file...');
       let jsonFields = this.csvFields;
-      console.log('Current csvFields state:', jsonFields);
       if (jsonFields.length > 0) return jsonFields;
-
       const service = starter.templateConfiguratorService;
       jsonFields = await service.loadMappingFields();
-      console.log('Loaded mapping fields:', jsonFields);
       return jsonFields;
-    } catch (error) {
-      console.error('Failed to load mapping fields from constant file:', error);
+    } catch {
       return [];
     }
   }
@@ -227,17 +218,18 @@ export class ScxMappingTable implements ComponentInterface {
   async saveMappings(): Promise<boolean> {
     if (!this.table) return false;
 
-    // Get model name from state
     const modelName = this.userModel?.name?.trim();
     const fileName = this.userModel?.fileName?.trim();
-    console.log('Saving mappings for model:', modelName);
+
+    this.modelNameErrorShow = false;
+    this.fileErrorShow = false;
 
     if (!modelName) {
-      alert('Please enter a model name.');
+      this.modelNameErrorShow = true;
       return false;
     }
     if (!fileName) {
-      alert('Please enter a model file name.');
+      this.fileErrorShow = true;
       return false;
     }
 
@@ -271,21 +263,22 @@ export class ScxMappingTable implements ComponentInterface {
       return { ...field, ...row, entityType: resolvedEntityType };
     });
 
-    console.log('Updated csvFields:', this.csvFields);
-
     await service.saveMapping(this.csvFields);
     this.changePage.emit('scoring');
     return true;
   }
 
-  private handleModelRemove = async (event: Event) => {
+  @Listen('sl-remove')
+  async handleModelRemove(event: Event): Promise<void> {
+    const fromFileTag = event.composedPath().some((node) => node instanceof HTMLElement && node.id === 'fileTag');
+    if (!fromFileTag) {
+      return;
+    }
+
     event.preventDefault();
-    console.log('Model remove triggered');
     const service = starter.templateConfiguratorService;
     await service.updateModelFileName('');
-    // this.userModel = null;
-    // this.persistedUserModel = null;
-  };
+  }
 
   render() {
     return (
@@ -297,8 +290,8 @@ export class ScxMappingTable implements ComponentInterface {
                 <sl-input
                   size="small"
                   name="modelName"
-                  label="Model Name"
-                  placeholder="Model customer Outband"
+                  label={tt('SM.MAPPING.MODEL.MODEL_NAME')}
+                  placeholder={tt('SM.MAPPING.MODEL.MODEL_TEXT')}
                   required
                   style={{ width: 'stretch' }}
                   value={this.userModel?.name || ''}
@@ -306,7 +299,8 @@ export class ScxMappingTable implements ComponentInterface {
                     (this.userModel = { ...this.userModel, name: (event.target as HTMLInputElement).value } as Model)
                   }
                 ></sl-input>
-                <sl-tag removable id="fileTag" ref={(el: Element | undefined) => (this.fileTagEl = el as HTMLElement)}>
+                {this.modelNameErrorShow && <div class="error-message">{tt('SM.MAPPING.MODEL.MODEL_ERROR')}</div>}
+                <sl-tag removable id="fileTag">
                   <sl-icon name="cv-document"></sl-icon>
                   {this.userModel?.fileName || ''}
                 </sl-tag>
@@ -318,7 +312,7 @@ export class ScxMappingTable implements ComponentInterface {
           <div slot="header" class="card-header__header">
             <div class="card-header__content">
               <sl-icon name="cv-sort-cx-card" class="cv-sort-cx-card"></sl-icon>
-              <h4>Field Mapping Configuration</h4>
+              <h4>{tt('SM.MAPPING.TABLE.HEADER')}</h4>
             </div>
           </div>
           <div class="card-body">

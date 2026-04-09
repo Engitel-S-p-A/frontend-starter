@@ -15,7 +15,7 @@ scx-score-panel {
 }
 
 .weight {
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 
 .red {
@@ -42,7 +42,7 @@ scx-score-panel {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  padding: 15px;
+  padding: 0px 16px;
   border: 1px solid var(--sl-color-neutral-200);
   border-radius: 5px;
   font-weight: 700;
@@ -60,16 +60,18 @@ scx-score-panel {
       min-height: 30px;
       display: flex;
       align-items: center;
-
-      &__border {
-        border-right: 1px solid var(--sl-color-neutral-200);
-        padding: 0px 20px;
-      }
+      
+      
     }
 
     &__button {
       font-size: 1rem;
-      padding: 0px 20px;
+      padding: 0 20px;
+      &__border {
+        border-left: 1px solid var(--sl-color-neutral-200);
+        padding-left: 20px;
+        margin-left: 20px;
+      }
     }
   }
 }
@@ -122,8 +124,9 @@ scx-score-panel {
     sl-icon {
       width: 63px;
       height: 63px;
-      background-color: #DEE2E7;
+      background-color: #F1F3F7;
       border-radius: 50%;
+      border:1px solid #DEE2E7;
     }
   }
 

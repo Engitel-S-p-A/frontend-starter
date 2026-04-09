@@ -14,14 +14,17 @@ $label-padding: 0;
   .title-wrap {
     padding: var(--sl-spacing-x-small);
     font-weight: var(--sl-font-weight-bold);
-    color: var(--sl-color-neutral-800);
+    color: #52525b
   }
 
   .label-wrap {
     padding: $label-padding;
     color: var(--sl-color-neutral-500);
-    font-size: var(--sl-font-size-small);
+    font-size: var(--sl-font-size-x-small);
     width: $label-width;
     text-align: center;
   }
 }
+sl-icon {
+    color: #525252;
+  }

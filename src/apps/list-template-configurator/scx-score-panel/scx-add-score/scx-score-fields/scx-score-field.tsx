@@ -2,7 +2,8 @@ import { Component, ComponentInterface, Event, EventEmitter, Host, Prop, State, 
 import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs/internal/Subject';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-import { FieldToSend, Score } from '../../list-template-configurator.interface';
+import { tt } from '../../../../../libs/i18n';
+import { FieldToSend, Score } from '../../../list-template-configurator.interface';
 
 @Component({
   tag: 'scx-score-field',
@@ -46,7 +47,10 @@ export class ScxScoreField implements ComponentInterface {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
+  emptyScore(score: Score) {
+    const keys = Object.keys(score);
+    return keys.length === 1 && keys[0] === 'score';
+  }
   async componentWillLoad() {
     const current = this.field.scores.find((score) => score.score == this.nScore);
     if (current) this.currentScore = current;
@@ -148,8 +152,6 @@ export class ScxScoreField implements ComponentInterface {
     let result = this.otherScore.reduce((acc, score) => {
       let scoreFrom = score.numericValue?.from;
       scoreFrom = scoreFrom && this.editTypeFromTo(scoreFrom);
-      console.log('from', from);
-      console.log('scoreFrom', scoreFrom);
       if (from && scoreFrom && from < scoreFrom) {
         if (acc != zero && scoreFrom > acc) {
           return acc;
@@ -174,7 +176,7 @@ export class ScxScoreField implements ComponentInterface {
   getComponent() {
     switch (this.field.type) {
       case 'Boolean':
-        return (
+        return this.editMode ? (
           this.editMode && (
             <sl-switch
               onsl-change={(e: Event) => {
@@ -184,9 +186,11 @@ export class ScxScoreField implements ComponentInterface {
               disabled={this.nScore === 2}
               checked={this.currentScore.boolValue}
             >
-              Has value
+              {tt('SM.SCORE.PANEL.BOOLEAN')}
             </sl-switch>
           )
+        ) : (
+          <p>{this.currentScore.boolValue ? 'true' : 'false'}</p>
         );
       case 'String':
         return this.editMode ? (
@@ -209,7 +213,7 @@ export class ScxScoreField implements ComponentInterface {
             <sl-input
               size="small"
               type={this.field.type === 'Numeric' ? 'number' : 'date'}
-              label="from"
+              label={tt('SM.SCORE.PANEL.FROM')}
               value={this.currentScore.numericValue?.from ?? ''}
               onsl-input={(e: Event) => {
                 const target = e.target as HTMLFormElement & { value: number };
@@ -219,7 +223,7 @@ export class ScxScoreField implements ComponentInterface {
             <sl-input
               size="small"
               type={this.field.type === 'Numeric' ? 'number' : 'date'}
-              label="to"
+              label={tt('SM.SCORE.PANEL.TO')}
               value={this.currentScore.numericValue?.to ?? ''}
               onsl-input={(e: Event) => {
                 const target = e.target as HTMLFormElement & { value: number };
@@ -240,26 +244,22 @@ export class ScxScoreField implements ComponentInterface {
     return (
       <Host>
         {this.field.type !== '' && this.field.type !== 'Unset' && (
-          <div class="scorebox">
+          <div class={`scorebox ${!this.editMode && 'closed'}`}>
             <div class="scorebox__header">
-              {this.field.type === 'Boolean' && !this.editMode ? (
-                this.currentScore.score === this.switch && (
-                  <sl-tag size="medium" variant={this.nScore === 1 ? `danger` : `success`}>
+              {(this.editMode || (!this.editMode && !this.emptyScore(this.currentScore))) && (
+                <div>
+                  <sl-tag
+                    size="medium"
+                    variant={this.nScore === 1 ? `danger` : this.nScore === 2 ? `warning` : `success`}
+                  >
                     {this.nScore}
                   </sl-tag>
-                )
-              ) : (
-                <sl-tag
-                  size="medium"
-                  variant={this.nScore === 1 ? `danger` : this.nScore === 2 ? `warning` : `success`}
-                >
-                  {this.nScore}
-                </sl-tag>
+                  <div>{this.getComponent()}</div>
+                </div>
               )}
-              <div>{this.getComponent()}</div>
               {this.field.type !== 'Boolean' && this.editMode && (
                 <sl-button variant="button" size="small" onClick={() => this.clear()}>
-                  Clear
+                  {tt('SM.SCORE.PANEL.CLEAR')}
                 </sl-button>
               )}
             </div>

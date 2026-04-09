@@ -12,16 +12,13 @@ import { IModal } from './libs/modal';
 import { StyleEventDetail } from './shared/scx-radio-group/scx-radio-button/scx-radio-button';
 import { RadioGroupChangeEventDetail } from './shared/scx-radio-group/scx-radio-group';
 
-export { FieldToSend, Model, Score } from './apps/list-template-configurator/list-template-configurator.interface';
 export { IModal } from './libs/modal';
+export { FieldToSend, Model, Score } from './apps/list-template-configurator/list-template-configurator.interface';
 export { StyleEventDetail } from './shared/scx-radio-group/scx-radio-button/scx-radio-button';
 export { RadioGroupChangeEventDetail } from './shared/scx-radio-group/scx-radio-group';
 export namespace Components {
   interface ListTemplateConfigurator {
-    /**
-     * @default ''
-     */
-    apiUrl: string;
+    modal: IModal;
   }
   interface ScxAddModel {
     saveCurrentStep: () => Promise<'model' | 'mapping' | null>;
@@ -91,13 +88,6 @@ export namespace Components {
   interface ScxIconsExample {}
   interface ScxMappingTable {
     saveMappings: () => Promise<boolean>;
-  }
-  interface ScxModal {
-    modal: IModal;
-    /**
-     * @default 'Scoree Modal'
-     */
-    modalTitle: string;
   }
   /**
    * Example Modal Component
@@ -512,11 +502,6 @@ declare global {
     prototype: HTMLScxMappingTableElement;
     new (): HTMLScxMappingTableElement;
   };
-  interface HTMLScxModalElement extends Components.ScxModal, HTMLStencilElement {}
-  var HTMLScxModalElement: {
-    prototype: HTMLScxModalElement;
-    new (): HTMLScxModalElement;
-  };
   /**
    * Example Modal Component
    * Demonstrates how to create a modal content component that works with the Modal Service.
@@ -783,7 +768,6 @@ declare global {
     'scx-file-uploader': HTMLScxFileUploaderElement;
     'scx-icons-example': HTMLScxIconsExampleElement;
     'scx-mapping-table': HTMLScxMappingTableElement;
-    'scx-modal': HTMLScxModalElement;
     'scx-modal-example': HTMLScxModalExampleElement;
     'scx-radio-button': HTMLScxRadioButtonElement;
     'scx-radio-group': HTMLScxRadioGroupElement;
@@ -801,10 +785,7 @@ declare namespace LocalJSX {
     | ({ [P in `prop:${K}`]: PropT } & { [P in K | `attr:${K}`]?: never });
 
   interface ListTemplateConfigurator {
-    /**
-     * @default ''
-     */
-    apiUrl?: string;
+    modal: IModal;
   }
   interface ScxAddModel {}
   interface ScxAddScore {
@@ -875,13 +856,6 @@ declare namespace LocalJSX {
   interface ScxIconsExample {}
   interface ScxMappingTable {
     onChangePage?: (event: ScxMappingTableCustomEvent<string>) => void;
-  }
-  interface ScxModal {
-    modal: IModal;
-    /**
-     * @default 'Scoree Modal'
-     */
-    modalTitle?: string;
   }
   /**
    * Example Modal Component
@@ -1070,9 +1044,6 @@ declare namespace LocalJSX {
    */
   interface SmilecxOutboundManager {}
 
-  interface ListTemplateConfiguratorAttributes {
-    apiUrl: string;
-  }
   interface ScxAddScoreAttributes {
     addNewField: boolean;
     fieldIndex: number;
@@ -1087,9 +1058,6 @@ declare namespace LocalJSX {
     icon: string;
     label: string;
     esTitle: string;
-  }
-  interface ScxModalAttributes {
-    modalTitle: string;
   }
   interface ScxModalExampleAttributes {
     modalTitle: string;
@@ -1122,15 +1090,7 @@ declare namespace LocalJSX {
   }
 
   interface IntrinsicElements {
-    'list-template-configurator': Omit<ListTemplateConfigurator, keyof ListTemplateConfiguratorAttributes> & {
-      [K in keyof ListTemplateConfigurator & keyof ListTemplateConfiguratorAttributes]?: ListTemplateConfigurator[K];
-    } & {
-      [K in keyof ListTemplateConfigurator &
-        keyof ListTemplateConfiguratorAttributes as `attr:${K}`]?: ListTemplateConfiguratorAttributes[K];
-    } & {
-      [K in keyof ListTemplateConfigurator &
-        keyof ListTemplateConfiguratorAttributes as `prop:${K}`]?: ListTemplateConfigurator[K];
-    };
+    'list-template-configurator': ListTemplateConfigurator;
     'scx-add-model': ScxAddModel;
     'scx-add-score': Omit<ScxAddScore, keyof ScxAddScoreAttributes> & {
       [K in keyof ScxAddScore & keyof ScxAddScoreAttributes]?: ScxAddScore[K];
@@ -1155,11 +1115,6 @@ declare namespace LocalJSX {
       >;
     'scx-icons-example': ScxIconsExample;
     'scx-mapping-table': ScxMappingTable;
-    'scx-modal': Omit<ScxModal, keyof ScxModalAttributes> & {
-      [K in keyof ScxModal & keyof ScxModalAttributes]?: ScxModal[K];
-    } & { [K in keyof ScxModal & keyof ScxModalAttributes as `attr:${K}`]?: ScxModalAttributes[K] } & {
-      [K in keyof ScxModal & keyof ScxModalAttributes as `prop:${K}`]?: ScxModal[K];
-    };
     'scx-modal-example': Omit<ScxModalExample, keyof ScxModalExampleAttributes> & {
       [K in keyof ScxModalExample & keyof ScxModalExampleAttributes]?: ScxModalExample[K];
     } & {
@@ -1251,7 +1206,6 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLScxIconsExampleElement>;
       'scx-mapping-table': LocalJSX.IntrinsicElements['scx-mapping-table'] &
         JSXBase.HTMLAttributes<HTMLScxMappingTableElement>;
-      'scx-modal': LocalJSX.IntrinsicElements['scx-modal'] & JSXBase.HTMLAttributes<HTMLScxModalElement>;
       /**
        * Example Modal Component
        * Demonstrates how to create a modal content component that works with the Modal Service.

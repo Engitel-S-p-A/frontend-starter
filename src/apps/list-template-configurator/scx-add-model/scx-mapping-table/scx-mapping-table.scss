@@ -2,7 +2,8 @@
 @import '~tabulator-tables/dist/css/tabulator.min.css';
 
 .tabulator {
-  border: var(--sl-border-base);
+  margin: -20px -11px -19px -10px;
+    border: 0;
 
   .tabulator-header {
     border-bottom: var(--sl-border-base);
@@ -26,8 +27,13 @@
   .tabulator-cell.tabulator-row-header {
     background: transparent;
     border-bottom: 0;
-    border-right: 0 !important;
+    border-right: 0 !important;    
+    padding-right: 0 !important;
   }
+}
+
+.tabulator-row.tabulator-row-even {
+    background-color: var(--sl-color-bg1);
 }
 
 .checkbox-container {
@@ -41,6 +47,8 @@
 sl-checkbox {
   position: relative;
   margin-right: -0.5em;
+  width: 16px;
+  height: 16px;
 }
 
 sl-checkbox::before {
@@ -49,8 +57,8 @@ sl-checkbox::before {
   overflow: hidden;
   border: 1px solid #ccc;
   background-color: #fff;
-  width: 21px;
-  height: 21px;
+  width: 16px;
+  height: 16px;
   display: block;
   position: absolute;
   top: 0px;
@@ -64,16 +72,16 @@ sl-checkbox[checked]::before {
 }
 
 sl-checkbox[checked]::after {
-  content: '';
-  width: 3px;
-  height: 9px;
-  border-bottom: 2px solid #fff;
-  border-right: 2px solid #fff;
-  transform: rotate(45deg);
-  position: absolute;
-  top: 5px;
-  left: 7px;
-  z-index: 2;
+    content: "";
+    width: 3px;
+    height: 8px;
+    border-bottom: 2px solid #fff;
+    border-right: 2px solid #fff;
+    transform: rotate(45deg);
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    z-index: 2;
 }
 
 .save-button {
@@ -85,7 +93,7 @@ sl-checkbox[checked]::after {
 .vertical-cards-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .model-inputs-row {
@@ -93,6 +101,7 @@ sl-checkbox[checked]::after {
   flex-direction: row;
   gap: 8px;
   align-items: flex-end;
+  position: relative;
 }
 
 .scoresDialog {
@@ -108,7 +117,9 @@ sl-checkbox[checked]::after {
     width: stretch;
   }
 }
-
+.card-header__header {
+  margin: 0 -8px;
+}
 .card-header__content {
   display: flex;
   align-items: center;
@@ -133,4 +144,17 @@ sl-checkbox[checked]::after {
     margin-right: 10px;
     color: var(--sl-color-primary-500);
   }
+  
+}
+
+.card-body {
+  margin: -0.6rem;
+}
+
+.error-message {
+  color: var(--sl-color-danger-500);
+  font-size: var(--sl-input-label-font-size-x-small);
+  position: absolute;
+  left: 114px;
+  top: 2px;
 }

@@ -1,0 +1,57 @@
+:host .add-model-button {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.vertical-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: stretch;
+  height: 100%;
+}
+
+.add-model-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+}
+
+.upload-card {
+  height: 100%;
+  border-radius: 4px;
+      background-image: linear-gradient(to left, #71717a 50%, transparent 50%), linear-gradient(to left, #71717a 50%, transparent 50%), linear-gradient(to top, #71717a 50%, transparent 50%), linear-gradient(to top, #71717a 50%, transparent 50%);
+    background-position: left top, left bottom, left top, right top;
+    background-Repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    background-Size: 17.6px 1px, 17.6px 1px, 1px 17.6px, 1px 17.6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  .card-body {
+    min-height: 403px;
+    display: flex;
+    justify-content: center;
+  }
+  
+}
+
+sl-card {
+  width: 100%;
+  margin-bottom: 16px;
+}
+.card-body {
+  margin: -0.6rem;
+}
+.error-message {
+  color: var(--sl-color-danger-500);
+  font-size: var(--sl-input-label-font-size-x-small);
+  margin-top: 0.5rem;
+  &.txtcenter {
+    text-align: center;
+  }
+}

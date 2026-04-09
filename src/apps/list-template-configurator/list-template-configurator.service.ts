@@ -17,8 +17,8 @@ import {
 export class ListTemplateConfiguratorService implements IListTemplateConfiguratorService {
   private logger = this.loggerService.getLogger(StarterDebugNamespaces.TemplateConfigurator);
   mappingItems$ = new BehaviorSubject<MappingItem[]>([]);
-  JSONFields$ = new BehaviorSubject<CSVJSONItems[]>([]);
-  UserModel$ = new BehaviorSubject<Model | null>(null);
+  jsonFields$ = new BehaviorSubject<CSVJSONItems[]>([]);
+  userModel$ = new BehaviorSubject<Model | null>(null);
   fieldsToSend$ = new BehaviorSubject<FieldToSend[]>([]);
   formToSend$ = new BehaviorSubject<FormToSend>({ contactability: [], propensity: [] });
   totalweightContactability$ = new BehaviorSubject<number>(0);
@@ -29,15 +29,15 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
     this.logger.log('ListTemplateConfiguratorService initialized');
   }
 
-  async LoadcsvJson(): Promise<string> {
-    const filePath = '../../assets/data/leads-schema.json'; // Adjust path as needed
+  async loadcsvJson(): Promise<string> {
+    const filePath = '/assets/data/leads-schema.json';
     try {
       const response = await fetch(filePath);
       if (!response.ok) throw new Error('Failed to fetch JSON file');
       const jsonText = await response.text();
       return jsonText;
     } catch (error) {
-      console.error('Failed to load mapping fields from constant file:', error);
+      this.logger.error('Failed to load mapping fields from constant file:', error);
       return '';
     }
   }
@@ -45,7 +45,7 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
   async loadMappingFields(): Promise<CSVJSONItems[]> {
     this.logger.debug('Loading mapping fields from JSON...');
     try {
-      const jsonText = await this.LoadcsvJson();
+      const jsonText = await this.loadcsvJson();
       if (!jsonText || jsonText.trim() === '') throw new Error('No JSON data loaded');
 
       const schema = JSON.parse(jsonText) as {
@@ -74,7 +74,7 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
         hidden: value.hidden,
       }));
 
-      this.JSONFields$.next(jsonFields);
+      this.jsonFields$.next(jsonFields);
       return jsonFields;
     } catch (error) {
       this.logger.error('Failed to load mapping fields from JSON:', error);
@@ -85,22 +85,22 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
   async saveMapping(value: CSVJSONItems[]): Promise<void> {
     this.logger.debug('Saving mapping configuration...');
 
-    this.JSONFields$.next(value);
+    this.jsonFields$.next(value);
 
-    const currentModel = this.UserModel$.getValue();
+    const currentModel = this.userModel$.getValue();
     if (currentModel) {
-      this.UserModel$.next({
+      this.userModel$.next({
         ...currentModel,
         properties: [...value],
       });
     }
 
-    console.log('Saved mapping configuration:', value);
+    this.logger.log('Saved mapping configuration:', value);
 
     //Populate mappingItems$ based on value for using in scoring configuration
     const mappingItems = value.map((item) => ({
       csvField: item.name,
-      aliasName: item.alias || '', // Use alias if available, otherwise default to empty string
+      aliasName: item.alias || '',
       mappingField: item.entityType || '',
     }));
     this.mappingItems$.next(mappingItems);
@@ -109,16 +109,15 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
   async saveModel(model: Model): Promise<void> {
     const normalizedModel: Model = {
       ...model,
-      properties: model.properties ?? this.JSONFields$.getValue(),
+      properties: model.properties ?? this.jsonFields$.getValue(),
     };
 
     this.logger.debug('Saving model...', normalizedModel);
-    // Implement your logic to save the model, e.g., send it to an API or store it locally
-    this.UserModel$.next(normalizedModel);
+    this.userModel$.next(normalizedModel);
   }
 
   async updateModelFileName(fileName: string): Promise<boolean> {
-    const currentModel = this.UserModel$.getValue();
+    const currentModel = this.userModel$.getValue();
     if (!currentModel) {
       this.logger.warn('Cannot update fileName: no model is loaded');
       return false;
@@ -129,13 +128,13 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
       fileName,
     };
 
-    this.UserModel$.next(updatedModel);
+    this.userModel$.next(updatedModel);
     return true;
   }
 
   async deleteModel(): Promise<void> {
     this.logger.debug('Deleting model...');
-    this.UserModel$.next(null);
+    this.userModel$.next(null);
   }
 
   addFieldToSend(field: FieldToSend, scope?: string) {

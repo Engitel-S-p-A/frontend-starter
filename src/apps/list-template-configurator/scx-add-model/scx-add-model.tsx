@@ -1,7 +1,8 @@
 import { Component, ComponentInterface, Element, Method, State, h } from '@stencil/core';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { starter } from '../../../../di/containers';
-import type { Model } from '../../list-template-configurator.interface';
+import { starter } from '../../../di/containers';
+import { tt } from '../../../libs/i18n';
+import type { Model } from '../list-template-configurator.interface';
 
 @Component({
   tag: 'scx-add-model',
@@ -15,13 +16,15 @@ export class ScxAddModel implements ComponentInterface {
   @State() modelName = '';
   @State() fileName = '';
   @State() userModel: Model | null = null;
+  @State() modelNameErrorShow = false;
+  @State() fileErrorShow = false;
 
   private subscriptions: Subscription[] = [];
 
   async componentWillLoad() {
     const service = starter.templateConfiguratorService;
     this.subscriptions.push(
-      service.UserModel$.subscribe((model) => {
+      service.userModel$.subscribe((model) => {
         this.userModel = model;
         this.modelName = model?.name ?? '';
         this.fileName = model?.fileName ?? '';
@@ -49,17 +52,20 @@ export class ScxAddModel implements ComponentInterface {
 
   @Method()
   async saveModel(): Promise<boolean> {
-    console.log('saveModel method called with modelName:', this.modelName);
     const modelName = this.modelName.trim();
-    const file = this.fileInput?.files && this.fileInput.files.length > 0 ? (this.fileInput.files[0] as File) : null;
+    const file = this.fileInput?.files?.[0] ?? null;
     const resolvedFileName = file?.name ?? this.userModel?.fileName ?? this.fileName;
 
+    this.modelNameErrorShow = false;
+    this.fileErrorShow = false;
+
     if (!modelName) {
-      alert('Please enter a model name.');
+      this.modelNameErrorShow = true;
       return false;
     }
+
     if (!resolvedFileName) {
-      alert('Please select a model file.');
+      this.fileErrorShow = true;
       return false;
     }
 
@@ -79,8 +85,6 @@ export class ScxAddModel implements ComponentInterface {
         };
 
     await service.saveModel(model);
-
-    console.log('Model saved:', model);
     return true;
   }
 
@@ -121,13 +125,14 @@ export class ScxAddModel implements ComponentInterface {
                   <sl-input
                     size="small"
                     name="modelName"
-                    label="Model Name"
-                    placeholder="Insert model name"
+                    label={tt('SM.MAPPING.MODEL.MODEL_NAME')}
+                    placeholder={tt('SM.MAPPING.MODEL.MODEL_TEXT')}
                     required
                     style={{ width: '100%' }}
                     value={this.modelName || ''}
                     onInput={(event: Event) => (this.modelName = (event.target as HTMLInputElement).value)}
                   ></sl-input>
+                  {this.modelNameErrorShow && <div class="error-message">{tt('SM.MAPPING.MODEL.MODEL_ERROR')}</div>}
                 </div>
               </div>
             </sl-card>
@@ -143,10 +148,13 @@ export class ScxAddModel implements ComponentInterface {
                   />
                   <scx-file-uploader
                     icon="cv-cloud-up"
-                    esTitle={this.fileName || 'Drag and drop your model list here'}
-                    label="Supported formats: .XLSX .CSV"
+                    esTitle={this.fileName || tt('SM.MAPPING.MODEL.FILE_UPLOAD_EMPTY')}
+                    label={tt('SM.MAPPING.MODEL.FILE_UPLOAD_FORMATS')}
                     onIconClick={this.handleIconClick}
                   ></scx-file-uploader>
+                  {this.fileErrorShow && (
+                    <div class="error-message txtcenter">{tt('SM.MAPPING.MODEL.FILE_UPLOAD_ERROR')}</div>
+                  )}
                 </div>
               </div>
             </div>

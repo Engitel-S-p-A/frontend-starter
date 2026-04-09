@@ -44,20 +44,20 @@ export interface CSVJSONItems {
   dateFormat?: string;
   description?: string;
   entityType?: string;
-  alias?: string; // Add alias to CSVJSONItems
-  recency?: boolean; // Add recency to CSVJSONItems
-  monetary?: boolean; // Add monetary to CSVJSONItems
-  frequency?: boolean; // Add frequency to CSVJSONItems
-  mandatory?: boolean; // Add mandatory to CSVJSONItems
-  hidden?: boolean; // Add hidden to CSVJSONItems
+  alias?: string;
+  recency?: boolean;
+  monetary?: boolean;
+  frequency?: boolean;
+  mandatory?: boolean;
+  hidden?: boolean;
 }
 
 export type CSVJSONFieldDefinition = Omit<CSVJSONItems, 'name'>;
 
 export interface IListTemplateConfiguratorService {
   mappingItems$: BehaviorSubject<MappingItem[]>;
-  JSONFields$: BehaviorSubject<CSVJSONItems[]>;
-  UserModel$: BehaviorSubject<Model | null>;
+  jsonFields$: BehaviorSubject<CSVJSONItems[]>;
+  userModel$: BehaviorSubject<Model | null>;
   fieldsToSend$: BehaviorSubject<FieldToSend[]>;
   totalweight$: BehaviorSubject<number>;
   formToSend$: BehaviorSubject<FormToSend>;
@@ -65,14 +65,8 @@ export interface IListTemplateConfiguratorService {
   totalweightPropensity$: BehaviorSubject<number>;
 
   saveMapping(value: CSVJSONItems[]): Promise<void>;
-
-  /**
-   * Load mapping fields from JSON
-   *
-   * @returns Promise that always resolves (never throws)
-   */
   loadMappingFields(): Promise<CSVJSONItems[]>;
-  LoadcsvJson(): Promise<string>;
+  loadcsvJson(): Promise<string>;
   saveModel(model: Model): Promise<void>;
   updateModelFileName(fileName: string): Promise<boolean>;
   deleteModel(): Promise<void>;

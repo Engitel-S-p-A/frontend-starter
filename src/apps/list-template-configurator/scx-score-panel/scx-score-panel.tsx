@@ -1,7 +1,8 @@
 import { Component, ComponentInterface, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { Subscription } from 'rxjs';
-import { starter } from '../../../../di/containers';
-import { FieldToSend, FormToSend } from '../../list-template-configurator.interface';
+import { starter } from '../../../di/containers';
+import { tt } from '../../../libs/i18n';
+import { FieldToSend, FormToSend } from '../list-template-configurator.interface';
 
 @Component({
   tag: 'scx-score-panel',
@@ -16,7 +17,10 @@ export class ScxScorePanel implements ComponentInterface {
   @State() addNewField = false;
   @State() totalWeight = 0;
   @Prop() scope!: 'Contactability' | 'Propensity';
-
+  text =
+    this.scope == 'Contactability'
+      ? tt('SM.SCORING.PANEL.EMPTY.CONTACTABILITY').split('{br}')
+      : tt('SM.SCORING.PANEL.EMPTY.PROPENSITY').split('{br}');
   async componentWillLoad() {
     this.subscriptions.push(
       this.scoringService.formToSend$.subscribe((fields) => {
@@ -69,12 +73,14 @@ export class ScxScorePanel implements ComponentInterface {
     return (
       <div class="singleScorePanel">
         <div class="score-panel-header">
-          <div class="score-panel-header__title">{this.scope} Score (CS)</div>
+          <div class="score-panel-header__title">
+            {this.scope == 'Contactability' ? tt('SM.SCORING.PANEL.CONTACTABILITY') : tt('SM.SCORING.PANEL.PROPENSITY')}
+          </div>
           <div class="score-panel-header__amount">
             <p
-              class={`score-panel-header__amount__value ${this.totalWeight != 100 && `score-panel-header__amount__value__border`}`}
+              class={`score-panel-header__amount__value ${this.totalWeight != 100 && this.totalWeight != 0 && `score-panel-header__amount__value`}`}
             >
-              Total Weight:&nbsp;&nbsp;
+              {tt('SM.SCORING.PANEL.TOTAL')}&nbsp;&nbsp;
               <span
                 class={`weight ${this.totalWeight == 0 ? 'black' : this.totalWeight > 100 || this.totalWeight < 100 ? 'red' : 'green'}`}
               >
@@ -89,7 +95,7 @@ export class ScxScorePanel implements ComponentInterface {
               )}
             </p>
             {this.totalWeight != 100 && this.fieldsToSend.length > 0 && (
-              <span class="score-panel-header__amount__button">
+              <span class="score-panel-header__amount__button__border">
                 <sl-button variant="neutral" size="medium" onClick={() => this.scoringService.normalize(this.scope)}>
                   Normalize 100%
                 </sl-button>
@@ -99,25 +105,24 @@ export class ScxScorePanel implements ComponentInterface {
         </div>
         <div class="score-panel-add">
           <sl-button size="small" onClick={() => (this.addNewField = true)}>
-            <sl-icon slot="prefix" name="cv-plus" size="small"></sl-icon> Add score
+            <sl-icon slot="prefix" name="cv-plus" size="small"></sl-icon>
+            {tt('SM.SCORING.PANEL.ADD')}
           </sl-button>
         </div>
         <div class="score-panel-body">
           {this.addNewField && <scx-add-score addNewField={this.addNewField} scope={this.scope}></scx-add-score>}
           {this.fieldsToSend.length > 0
             ? this.fieldsToSend.map((field, index) => (
-                <scx-add-score fieldIndex={index} key={index} field={field} scope={this.scope}>
-                  {' '}
-                </scx-add-score>
+                <scx-add-score fieldIndex={index} key={index} field={field} scope={this.scope}></scx-add-score>
               ))
             : !this.addNewField && (
                 <div class="score-panel-body__empty">
                   <sl-icon name="cv-es-no-users-to-show" size="large"></sl-icon>
-                  <h4>No scores applied yet</h4>
+                  <h4>{tt('SM.SCORING.PANEL.EMPTY.SCORE')}</h4>
                   <p>
-                    Apply at least one score to reach 100% of
+                    {this.text[0]}
                     <br />
-                    {this.scope} Score (CS) weight.
+                    {this.text[1]}
                   </p>
                 </div>
               )}
