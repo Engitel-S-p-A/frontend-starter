@@ -244,7 +244,6 @@ export class ScxScoreField implements ComponentInterface {
                 if (this.field.type === 'Date') {
                   const target = e.target as HTMLFormElement;
                   if (!isNaN(new Date(target.value).getTime())) {
-                    console.log('eccomi');
                     this.handleNumericScore('from', target);
                   } else {
                     target.setCustomValidity('');
@@ -267,7 +266,6 @@ export class ScxScoreField implements ComponentInterface {
                 if (this.field.type === 'Date') {
                   const target = e.target as HTMLFormElement;
                   if (!isNaN(new Date(target.value).getTime())) {
-                    console.log('eccomi');
                     this.handleNumericScore('to', target);
                   } else {
                     target.setCustomValidity('');
