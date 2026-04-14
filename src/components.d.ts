@@ -214,6 +214,7 @@ export namespace Components {
      */
     otherScore: Score[];
     switch?: 1 | 3 | null;
+    validateAndReport: () => Promise<boolean>;
   }
   interface ScxScorePanel {
     scope: 'Contactability' | 'Propensity';

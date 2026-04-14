@@ -1,9 +1,22 @@
-import { Component, ComponentInterface, Event, EventEmitter, Host, Prop, State, Watch, h } from '@stencil/core';
+import {
+  Component,
+  ComponentInterface,
+  Element,
+  Event,
+  EventEmitter,
+  Host,
+  Method,
+  Prop,
+  State,
+  Watch,
+  h,
+} from '@stencil/core';
 import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs/internal/Subject';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { tt } from '../../../../../libs/i18n';
 import { FieldToSend, Score } from '../../../list-template-configurator.interface';
+import { editType, validateNumericScore } from '../../scx-score-utilities/scx-invalid-numeric-score';
 
 @Component({
   tag: 'scx-score-field',
@@ -12,6 +25,7 @@ import { FieldToSend, Score } from '../../../list-template-configurator.interfac
 })
 export class ScxScoreField implements ComponentInterface {
   private subscriptions = new Subscription();
+  @Element() hostEl!: HTMLElement;
   @Event() editScore!: EventEmitter<Score>;
   @Event() deleteScore!: EventEmitter<number>;
   @Event() editCheck!: EventEmitter<1 | 3 | null>;
@@ -22,22 +36,13 @@ export class ScxScoreField implements ComponentInterface {
   @Prop() otherScore: Score[] = [];
   @State() currentScore: Score = { score: 0 };
   private numericInput$ = new Subject<{ target?: HTMLFormElement; part?: 'from' | 'to' }>();
-  private numericInputTo$ = new Subject<HTMLFormElement | null>();
   private destroy$ = new Subject<void>();
 
   connectedCallback() {
     this.subscriptions.add(
-      this.numericInput$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((valore) => {
+      this.numericInput$.pipe(debounceTime(400), takeUntil(this.destroy$)).subscribe((valore) => {
         if (valore.part && valore.target) {
           this.handleNumericScore(valore.part, valore.target);
-        }
-      })
-    );
-
-    this.subscriptions.add(
-      this.numericInputTo$.pipe(debounceTime(200), takeUntil(this.destroy$)).subscribe((valore) => {
-        if (valore) {
-          this.handleNumericTo(valore);
         }
       })
     );
@@ -80,7 +85,7 @@ export class ScxScoreField implements ComponentInterface {
     this.editScore.emit(this.currentScore);
   }
 
-  handleEditScore(value: string | number | boolean, part?: 'to' | 'from') {
+  handleEditScore(value: string, part?: 'to' | 'from') {
     if ((this.field.type === 'Numeric' || this.field.type === 'Date') && part) {
       const current = this.currentScore.numericValue;
       if (part)
@@ -88,7 +93,7 @@ export class ScxScoreField implements ComponentInterface {
           score: this.nScore,
           numericValue: {
             ...current,
-            [part]: value,
+            [part]: this.field.type === 'Numeric' ? editType(value, 'Numeric') : value,
           },
         };
     } else if (this.field.type === 'String') {
@@ -112,65 +117,80 @@ export class ScxScoreField implements ComponentInterface {
     }
     this.editScore.emit(this.currentScore);
   }
-  editTypeFromTo(val: string | Date | number) {
-    let newVal = val;
-    if (this.field.type === 'Date') {
-      newVal = new Date(val);
-    } else newVal = Number(val);
-    return newVal;
-  }
 
-  handleNumericScore(part: 'from' | 'to', target: HTMLFormElement, validTo?: boolean) {
-    let val = target.value;
-    const isDuplicate = this.otherScore.some((score) => {
-      let from = score.numericValue?.from;
-      let to = score.numericValue?.to;
-      if (from !== undefined && to !== undefined) {
-        from = this.editTypeFromTo(from);
-        to = this.editTypeFromTo(to);
-        val = this.editTypeFromTo(val);
-        return val >= from && val <= to;
-      }
-    });
-
-    if (isDuplicate) {
-      target.setCustomValidity('Valore già presente! Inserirne uno nuovo');
-      target.reportValidity();
-    } else if (validTo || part === 'from') {
-      target.setCustomValidity('');
-    }
+  handleNumericScore(part: 'from' | 'to', target: HTMLFormElement) {
     this.handleEditScore(target.value, part);
+    validateNumericScore({
+      target,
+      part,
+      type: this.field.type as 'Numeric' | 'Date',
+      currentScore: this.currentScore,
+      otherScores: this.otherScore,
+    });
   }
-
-  handleNumericTo(target: HTMLFormElement) {
-    const value = this.editTypeFromTo(target.value);
-    let validTo = false;
-    let from = this.currentScore.numericValue?.from;
-    from = from && this.editTypeFromTo(from);
-    const isInvalidRange = from && value <= from;
-    let zero = this.editTypeFromTo('0');
-    let result = this.otherScore.reduce((acc, score) => {
-      let scoreFrom = score.numericValue?.from;
-      scoreFrom = scoreFrom && this.editTypeFromTo(scoreFrom);
-      if (from && scoreFrom && from < scoreFrom) {
-        if (acc != zero && scoreFrom > acc) {
-          return acc;
-        } else return scoreFrom;
-      }
-      return acc;
-    }, zero);
-    if (this.field.type === 'Date') {
-      zero = (zero as Date).getTime();
-      result = (result as Date).getTime();
+  @Method()
+  async validateAndReport(): Promise<boolean> {
+    if (!this.editMode || (this.field.type !== 'Numeric' && this.field.type !== 'Date')) {
+      return true;
     }
-    if (isInvalidRange) {
-      target.setCustomValidity('inserire valore maggiore di from');
-      target.reportValidity();
-    } else if ((result != zero && result <= value) || (result != zero && !value)) {
-      target.setCustomValidity('Stai coprendo un range già esistente. Inserire valore corretto');
-      target.reportValidity();
-    } else validTo = true;
-    this.handleNumericScore('to', target, validTo);
+    const fromInput = this.hostEl.shadowRoot?.querySelector('sl-input[data-part="from"]') as
+      | (HTMLFormElement & {
+          value: string;
+          checkValidity: () => boolean;
+          reportValidity: () => boolean;
+          setCustomValidity: (msg: string) => void;
+        })
+      | null;
+    const toInput = this.hostEl.shadowRoot?.querySelector('sl-input[data-part="to"]') as
+      | (HTMLFormElement & {
+          value: string;
+          checkValidity: () => boolean;
+          reportValidity: () => boolean;
+          setCustomValidity: (msg: string) => void;
+        })
+      | null;
+
+    const fromValue =
+      typeof fromInput?.value === 'string' ? fromInput.value.trim() : String(fromInput?.value ?? '').trim();
+    const toValue = typeof toInput?.value === 'string' ? toInput.value.trim() : String(toInput?.value ?? '').trim();
+
+    if (fromInput && !fromValue) fromInput.setCustomValidity('');
+    if (toInput && !toValue) toInput.setCustomValidity('');
+
+    if (fromInput && fromValue) {
+      validateNumericScore({
+        target: fromInput,
+        part: 'from',
+        type: this.field.type as 'Numeric' | 'Date',
+        currentScore: this.currentScore,
+        otherScores: this.otherScore,
+      });
+    }
+
+    if (toInput && toValue) {
+      validateNumericScore({
+        target: toInput,
+        part: 'to',
+        type: this.field.type as 'Numeric' | 'Date',
+        currentScore: this.currentScore,
+        otherScores: this.otherScore,
+      });
+    }
+
+    const fromValid = fromInput ? !fromValue || fromInput.checkValidity() : true;
+    const toValid = toInput ? !toValue || toInput.checkValidity() : true;
+
+    if (!fromValid && fromInput) {
+      fromInput.reportValidity();
+      return false;
+    }
+
+    if (!toValid && toInput) {
+      toInput.reportValidity();
+      return false;
+    }
+
+    return true;
   }
 
   getComponent() {
@@ -211,23 +231,49 @@ export class ScxScoreField implements ComponentInterface {
         return this.editMode ? (
           <div class="scorebox__header__numeric">
             <sl-input
+              data-part="from"
               size="small"
               type={this.field.type === 'Numeric' ? 'number' : 'date'}
               label={tt('SM.SCORE.PANEL.FROM')}
               value={this.currentScore.numericValue?.from ?? ''}
               onsl-input={(e: Event) => {
                 const target = e.target as HTMLFormElement & { value: number };
-                this.numericInput$.next({ target: target, part: 'from' });
+                if (this.field.type === 'Numeric') this.numericInput$.next({ target: target, part: 'from' });
+              }}
+              onsl-change={(e: Event) => {
+                if (this.field.type === 'Date') {
+                  const target = e.target as HTMLFormElement;
+                  if (!isNaN(new Date(target.value).getTime())) {
+                    console.log('eccomi');
+                    this.handleNumericScore('from', target);
+                  } else {
+                    target.setCustomValidity('');
+                    target.reportValidity();
+                  }
+                }
               }}
             ></sl-input>
             <sl-input
+              data-part="to"
               size="small"
               type={this.field.type === 'Numeric' ? 'number' : 'date'}
               label={tt('SM.SCORE.PANEL.TO')}
               value={this.currentScore.numericValue?.to ?? ''}
               onsl-input={(e: Event) => {
                 const target = e.target as HTMLFormElement & { value: number };
-                this.numericInputTo$.next(target);
+                if (this.field.type === 'Numeric') this.numericInput$.next({ target: target, part: 'to' });
+              }}
+              onsl-change={(e: Event) => {
+                if (this.field.type === 'Date') {
+                  const target = e.target as HTMLFormElement;
+                  if (!isNaN(new Date(target.value).getTime())) {
+                    console.log('eccomi');
+                    this.handleNumericScore('to', target);
+                  } else {
+                    target.setCustomValidity('');
+                    target.reportValidity();
+                  }
+                }
               }}
             ></sl-input>
           </div>

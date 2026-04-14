@@ -178,7 +178,7 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
     }
   }
 
-  calcolo(current: FieldToSend[], tot: number) {
+  calculation(current: FieldToSend[], tot: number) {
     let diff = 0;
 
     const normalized = current.map((field, index) => {
@@ -202,11 +202,11 @@ export class ListTemplateConfiguratorService implements IListTemplateConfigurato
     const current = this.formToSend$.getValue();
     if (scope === 'Contactability') {
       const tot = this.totalweightContactability$.getValue();
-      const normalize = this.calcolo(current.contactability, tot);
+      const normalize = this.calculation(current.contactability, tot);
       this.formToSend$.next({ ...current, contactability: normalize });
     } else {
       const tot = this.totalweightPropensity$.getValue();
-      const normalize = this.calcolo(current.propensity, tot);
+      const normalize = this.calculation(current.propensity, tot);
       this.formToSend$.next({ ...current, propensity: normalize });
     }
   }

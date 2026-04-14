@@ -14,12 +14,9 @@ import { starter } from '../../../../di/containers';
 import { tt } from '../../../../libs/i18n';
 import { FieldToSend, Score } from '../../list-template-configurator.interface';
 
-export interface Field {
-  id: number;
-  title: string;
-  weight: number;
-  field_type: string;
-}
+type ScoreFieldElement = HTMLElement & {
+  validateAndReport?: () => Promise<boolean>;
+};
 
 @Component({
   tag: 'scx-add-score',
@@ -172,14 +169,26 @@ export class ScxAddScore implements ComponentInterface {
     const type = this.fieldScore.type;
     this.scores = updatedScores.filter((score) => {
       if (type == 'String' && score.arrayValue) return true;
-      else if ((type == 'Numeric' || type == 'Date') && score.numericValue) return true;
+      else if (type == 'Numeric' && score.numericValue && typeof score.numericValue.from === 'number') return true;
+      else if (type == 'Date' && score.numericValue && typeof score.numericValue.from === 'string') return true;
       else if (type == 'Boolean' && score.boolValue && score.score === this.checkSwitch) return true;
     });
   }
 
-  handleSubmit(e: Event) {
+  async handleSubmit(e: Event) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
+
+    const scoreFields = Array.from(form.querySelectorAll('scx-score-field')) as ScoreFieldElement[];
+    const customValidationResults = await Promise.all(
+      scoreFields.map((scoreField) =>
+        scoreField.validateAndReport ? scoreField.validateAndReport() : Promise.resolve(true)
+      )
+    );
+    if (customValidationResults.some((isValid) => !isValid)) {
+      return;
+    }
+
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
