@@ -32,6 +32,7 @@ export class ScxScoreField implements ComponentInterface {
   @Prop() field!: FieldToSend;
   @Prop() editMode!: boolean;
   @Prop() nScore!: number;
+  @Prop() scores?: Score | undefined;
   @Prop() switch?: 1 | 3 | null;
   @Prop() otherScore: Score[] = [];
   @State() currentScore: Score = { score: 0 };
@@ -52,24 +53,21 @@ export class ScxScoreField implements ComponentInterface {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
   emptyScore(score: Score) {
     const keys = Object.keys(score);
     return keys.length === 1 && keys[0] === 'score';
   }
+
   async componentWillLoad() {
     const current = this.field.scores.find((score) => score.score == this.nScore);
     if (current) this.currentScore = current;
     else this.currentScore.score = this.nScore;
   }
 
-  @Watch('field')
-  handleFieldChange() {
-    const current = this.field.scores.find((score) => score.score == this.nScore);
-    if (current) {
-      this.currentScore = { ...current };
-    } else {
-      this.currentScore = { score: this.nScore };
-    }
+  @Watch('scores')
+  editCurrentScore() {
+    if (this.scores != undefined) this.currentScore = { ...this.scores };
   }
 
   @Watch('switch')

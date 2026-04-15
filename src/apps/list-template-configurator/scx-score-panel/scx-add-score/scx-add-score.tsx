@@ -119,6 +119,7 @@ export class ScxAddScore implements ComponentInterface {
     return (
       <scx-score-field
         field={this.fieldScore}
+        scores={this.scores.length > 0 ? this.scores.filter((score) => score.score === nScore)[0] : undefined}
         nScore={nScore}
         editMode={this.editMode}
         switch={nScore != 2 ? this.checkSwitch : null}

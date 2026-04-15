@@ -209,6 +209,7 @@ export namespace Components {
     editMode: boolean;
     field: FieldToSend;
     nScore: number;
+    scores?: Score;
     /**
      * @default []
      */
@@ -1002,6 +1003,7 @@ declare namespace LocalJSX {
     editMode: boolean;
     field: FieldToSend;
     nScore: number;
+    scores?: Score;
     onDeleteScore?: (event: ScxScoreFieldCustomEvent<number>) => void;
     onEditCheck?: (event: ScxScoreFieldCustomEvent<1 | 3 | null>) => void;
     onEditScore?: (event: ScxScoreFieldCustomEvent<Score>) => void;
