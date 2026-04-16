@@ -1,6 +1,7 @@
 import {
   Component,
   ComponentInterface,
+  Element,
   Event,
   EventEmitter,
   Fragment,
@@ -16,6 +17,7 @@ import { FieldToSend, Score } from '../../list-template-configurator.interface';
 
 type ScoreFieldElement = HTMLElement & {
   validateAndReport?: () => Promise<boolean>;
+  refreshCurrentScore?: () => Promise<void>;
 };
 
 @Component({
@@ -45,6 +47,7 @@ export class ScxAddScore implements ComponentInterface {
   @Prop() fieldIndex = 0;
   @Prop() scope!: 'Contactability' | 'Propensity';
   @Prop() field: FieldToSend = { ...this.initField };
+  @Element() hostEl!: HTMLElement;
 
   async componentWillLoad() {
     this.fieldScore = { ...this.field };
@@ -80,13 +83,28 @@ export class ScxAddScore implements ComponentInterface {
     }
   }
 
-  handleAdd() {
+  async handleAdd() {
     this.fieldScore = {
       ...this.fieldScore,
       scores: this.scores,
     };
     this.addField.emit(this.fieldScore);
     this.editMode = false;
+    await this.refreshScoreFields();
+  }
+
+  async refreshScoreFields(): Promise<void> {
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+    const scoreFields = Array.from(
+      this.hostEl.shadowRoot?.querySelectorAll('scx-score-field') ?? []
+    ) as ScoreFieldElement[];
+
+    await Promise.all(
+      scoreFields.map((scoreField) =>
+        scoreField.refreshCurrentScore ? scoreField.refreshCurrentScore() : Promise.resolve()
+      )
+    );
   }
 
   handleDelete() {
@@ -94,16 +112,17 @@ export class ScxAddScore implements ComponentInterface {
     this.closeDialog();
   }
 
-  closeDialog() {
+  async closeDialog() {
     this.editMode = false;
     this.fieldScore = { ...this.field };
     this.scores = [...this.fieldScore.scores];
     if (this.addNewField) {
       this.closeNewDialog.emit();
     }
+    await this.refreshScoreFields();
   }
 
-  handleChange() {
+  async handleChange() {
     this.fieldScore = {
       ...this.fieldScore,
       scores: this.scores,
@@ -113,6 +132,7 @@ export class ScxAddScore implements ComponentInterface {
       key: this.fieldIndex,
     });
     this.editMode = false;
+    await this.refreshScoreFields();
   }
 
   getScores(nScore: number) {

@@ -65,9 +65,14 @@ export class ScxScoreField implements ComponentInterface {
     else this.currentScore.score = this.nScore;
   }
 
-  @Watch('scores')
-  editCurrentScore() {
-    if (this.scores != undefined) this.currentScore = { ...this.scores };
+  @Method()
+  async refreshCurrentScore(): Promise<void> {
+    const current = this.field.scores.find((score) => score.score == this.nScore);
+    if (current) {
+      this.currentScore = { ...current };
+    } else {
+      this.currentScore = { score: this.nScore };
+    }
   }
 
   @Watch('switch')
